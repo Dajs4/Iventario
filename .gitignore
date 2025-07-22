@@ -1,0 +1,60 @@
+# Entornos virtuales
+venv/
+env/
+ENV/
+.venv/
+.env/
+*.env
+
+# Archivos de Python compilados
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db
+
+# Archivos de bases de datos temporales
+*.sqlite3
+
+# Archivos de logs
+*.log
+
+# Archivos de migraciones compiladas
+*/migrations/__pycache__/
+*/migrations/*.pyc
+
+# Archivos de caché
+.cache/
+*.pot
+*.mo
+
+# Archivos de cobertura de tests
+htmlcov/
+coverage.xml
+*.cover
+*.py,cover
+.tox/
+
+# Carpeta de colecta de archivos estáticos
+staticfiles/
+static/
+
+# Archivos de medios generados por el usuario
+media/
+
+# Archivos creados por pytest o unittest
+.pytest_cache/
+nosetests.xml
+test-results/
+
+# Archivos de configuración local
+local_settings.py
+settings_local.py

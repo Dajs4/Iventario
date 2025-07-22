@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load inventario_extras %}
+
+{% block title %}Lista de Productos - Inventario{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Lista de Productos</h2>
+    <a href="{% url 'inventario:crear_producto' %}" class="btn btn-success">+ Nuevo Producto</a>
+</div>
+
+<!-- Barra de búsqueda y filtros -->
+<div class="search-bar">
+    <form method="get" class="search-form">
+        <div class="form-group" style="flex: 1;">
+            <label for="id_q">Buscar productos:</label>
+            {{ form_busqueda.q }}
+        </div>
+        <div class="form-group" style="min-width: 200px;">
+            <label for="id_categoria">Categoría:</label>
+            {{ form_busqueda.categoria }}
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn">Buscar</button>
+            {% if query or categoria %}
+                <a href="{% url 'inventario:lista_productos' %}" class="btn btn-secondary">Limpiar</a>
+            {% endif %}
+        </div>
+    </form>
+</div>
+
+<!-- Información de resultados -->
+<div class="mb-3">
+    <p class="text-muted">
+        {% if query or categoria %}
+            Mostrando {{ page_obj.paginator.count }} resultado{{ page_obj.paginator.count|pluralize }} 
+            {% if query %}para "{{ query }}"{% endif %}
+            {% if categoria %}en categoría "{{ form_busqueda.categoria.field.choices|lookup:categoria }}"{% endif %}
+        {% else %}
+            Total: {{ total_productos }} producto{{ total_productos|pluralize }}
+        {% endif %}
+    </p>
+</div>
+
+<!-- Controles de ordenamiento -->
+<div class="mb-3">
+    <span class="text-muted">Ordenar por:</span>
+    <a href="?{% if query %}q={{ query }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}sort=nombre" 
+       class="plain {% if sort == 'nombre' %}text-primary{% endif %}">Nombre A-Z</a> |
+    <a href="?{% if query %}q={{ query }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}sort=-nombre" 
+       class="plain {% if sort == '-nombre' %}text-primary{% endif %}">Nombre Z-A</a> |
+    <a href="?{% if query %}q={{ query }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}sort=precio" 
+       class="plain {% if sort == 'precio' %}text-primary{% endif %}">Precio ↑</a> |
+    <a href="?{% if query %}q={{ query }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}sort=-precio" 
+       class="plain {% if sort == '-precio' %}text-primary{% endif %}">Precio ↓</a> |
+    <a href="?{% if query %}q={{ query }}&{% endif %}{% if categoria %}categoria={{ categoria }}&{% endif %}sort=-creado" 
+       class="plain {% if sort == '-creado' %}text-primary{% endif %}">Más recientes</a>
+</div>
+
+<!-- Lista de productos -->
+{% if page_obj %}
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Precio</th>
+                    <th>Stock</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in page_obj %}
+                <tr>
+                    <td>
+                        <strong>{{ producto.nombre }}</strong>
+                        {% if producto.descripcion %}
+                            <br><small class="text-muted">{{ producto.descripcion|truncatechars:100 }}</small>
+                        {% endif %}
+                    </td>
+                    <td>${{ producto.precio }}</td>
+                    <td>
+                        {{ producto.stock }}
+                        <br><small class="
+                            {% if producto.stock == 0 %}text-danger
+                            {% elif producto.stock <= 5 %}text-warning
+                            {% else %}text-success{% endif %}">
+                            {{ producto.get_estado_stock }}
+                        </small>
+                    </td>
+                    <td>{{ producto.get_categoria_display }}</td>
+                    <td>
+                        {% if producto.activo %}
+                            <span class="badge badge-success">Activo</span>
+                        {% else %}
+                            <span class="badge badge-danger">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'inventario:detalle_producto' producto.pk %}{% if query_string %}?{{ query_string }}{% endif %}" 
+                           class="plain">Ver</a> |
+                        <a href="{% url 'inventario:editar_producto' producto.pk %}" 
+                           class="plain">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    {% if page_obj.has_other_pages %}
+        <div class="pagination">
+            {% if page_obj.has_previous %}
+                <a href="?{% if query_string %}{{ query_string }}&{% endif %}page=1">« Primera</a>
+                <a href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.previous_page_number }}">‹ Anterior</a>
+            {% endif %}
+
+            <span class="current">
+                Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.next_page_number }}">Siguiente ›</a>
+                <a href="?{% if query_string %}{{ query_string }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Última »</a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% else %}
+    <div class="card text-center">
+        <h3>No se encontraron productos</h3>
+        {% if query or categoria %}
+            <p class="text-muted">Intenta modificar los criterios de búsqueda o <a href="{% url 'inventario:lista_productos' %}" class="plain">ver todos los productos</a>.</p>
+        {% else %}
+            <p class="text-muted">No hay productos registrados aún.</p>
+            <a href="{% url 'inventario:crear_producto' %}" class="btn btn-success">Crear primer producto</a>
+        {% endif %}
+    </div>
+{% endif %}
+{% endblock %}

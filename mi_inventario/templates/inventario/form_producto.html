@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ titulo }} - Inventario{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% if producto %}{% url 'inventario:detalle_producto' producto.pk %}{% else %}{% url 'inventario:lista_productos' %}{% endif %}" class="plain">← Volver</a>
+</div>
+
+<div class="card">
+    <h2>{{ titulo }}</h2>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Errores no relacionados con campos específicos -->
+        {% if form.non_field_errors %}
+            <div class="alert alert-error">
+                {{ form.non_field_errors }}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }}*</label>
+            {{ form.nombre }}
+            {% if form.nombre.errors %}
+                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                    {% for error in form.nombre.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.descripcion.id_for_label }}">{{ form.descripcion.label }}</label>
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}
+                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                    {% for error in form.descripcion.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="text-muted">Descripción opcional del producto</small>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+            <div class="form-group">
+                <label for="{{ form.precio.id_for_label }}">{{ form.precio.label }}*</label>
+                {{ form.precio }}
+                {% if form.precio.errors %}
+                    <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                        {% for error in form.precio.errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="text-muted">Precio en pesos colombianos</small>
+            </div>
+
+            <div class="form-group">
+                <label for="{{ form.stock.id_for_label }}">{{ form.stock.label }}*</label>
+                {{ form.stock }}
+                {% if form.stock.errors %}
+                    <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                        {% for error in form.stock.errors %}
+                            <div>{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <small class="text-muted">Cantidad disponible</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.categoria.id_for_label }}">{{ form.categoria.label }}*</label>
+            {{ form.categoria }}
+            {% if form.categoria.errors %}
+                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                    {% for error in form.categoria.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                {{ form.activo }}
+                <label for="{{ form.activo.id_for_label }}" style="margin-bottom: 0;">{{ form.activo.label }}</label>
+            </div>
+            {% if form.activo.errors %}
+                <div style="color: var(--danger); font-size: 0.8rem; margin-top: 0.25rem;">
+                    {% for error in form.activo.errors %}
+                        <div>{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="text-muted">Si no está marcado, el producto no aparecerá como disponible</small>
+        </div>
+
+        <div class="d-flex gap-2 mt-4" style="gap: 1rem;">
+            <button type="submit" class="btn btn-success">{{ boton_texto }}</button>
+            <a href="{% if producto %}{% url 'inventario:detalle_producto' producto.pk %}{% else %}{% url 'inventario:lista_productos' %}{% endif %}" 
+               class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+</div>
+
+<script>
+// Auto-focus en el primer campo
+document.addEventListener('DOMContentLoaded', function() {
+    const firstInput = document.querySelector('input[type="text"]');
+    if (firstInput) {
+        firstInput.focus();
+    }
+});
+
+// Validación en tiempo real para el precio
+document.addEventListener('DOMContentLoaded', function() {
+    const precioInput = document.querySelector('input[name="precio"]');
+    if (precioInput) {
+        precioInput.addEventListener('input', function() {
+            const value = parseFloat(this.value);
+            if (value < 0) {
+                this.setCustomValidity('El precio no puede ser negativo');
+            } else if (value > 999999.99) {
+                this.setCustomValidity('El precio no puede ser mayor a $999,999.99');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+    
+    const stockInput = document.querySelector('input[name="stock"]');
+    if (stockInput) {
+        stockInput.addEventListener('input', function() {
+            const value = parseInt(this.value);
+            if (value < 0) {
+                this.setCustomValidity('El stock no puede ser negativo');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

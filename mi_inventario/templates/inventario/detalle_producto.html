@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ producto.nombre }} - Inventario{% endblock %}
+
+{% block content %}
+<div class="mb-3">
+    <a href="{% url 'inventario:lista_productos' %}{% if query_string %}?{{ query_string }}{% endif %}" class="plain">← Volver al listado</a>
+</div>
+
+<div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>{{ producto.nombre }}</h2>
+        <div>
+            {% if producto.activo %}
+                <span class="badge badge-success">Activo</span>
+            {% else %}
+                <span class="badge badge-danger">Inactivo</span>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <div>
+            <h4>Información General</h4>
+            <table class="table">
+                <tr>
+                    <td><strong>Nombre:</strong></td>
+                    <td>{{ producto.nombre }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Descripción:</strong></td>
+                    <td>{{ producto.descripcion|default:"Sin descripción" }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Categoría:</strong></td>
+                    <td>{{ producto.get_categoria_display }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Estado:</strong></td>
+                    <td>
+                        {% if producto.esta_disponible %}
+                            <span style="color: var(--success)">✓ Disponible</span>
+                        {% else %}
+                            <span style="color: var(--danger)">✗ No disponible</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <div>
+            <h4>Precio y Stock</h4>
+            <table class="table">
+                <tr>
+                    <td><strong>Precio:</strong></td>
+                    <td style="font-size: 1.2em; color: var(--success); font-weight: bold;">${{ producto.precio }}</td>
+                </tr>
+                <tr>
+                    <td><strong>Stock disponible:</strong></td>
+                    <td>
+                        <span style="font-size: 1.1em; font-weight: bold;">{{ producto.stock }} unidades</span>
+                        <br><small class="
+                            {% if producto.stock == 0 %}badge badge-danger
+                            {% elif producto.stock <= 5 %}badge badge-warning
+                            {% else %}badge badge-success{% endif %}">
+                            {{ producto.get_estado_stock }}
+                        </small>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Fechas</h4>
+        <table class="table">
+            <tr>
+                <td><strong>Creado:</strong></td>
+                <td>{{ producto.creado|date:"d/m/Y H:i" }}</td>
+            </tr>
+            <tr>
+                <td><strong>Última actualización:</strong></td>
+                <td>{{ producto.actualizado|date:"d/m/Y H:i" }}</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="mt-4 d-flex gap-2" style="gap: 1rem;">
+        <a href="{% url 'inventario:editar_producto' producto.pk %}" class="btn">✏️ Editar Producto</a>
+        <a href="{% url 'inventario:eliminar_producto' producto.pk %}" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?')">🗑️ Eliminar</a>
+    </div>
+</div>
+
+<style>
+.gap-2 {
+    gap: 1rem;
+}
+</style>
+{% endblock %}
