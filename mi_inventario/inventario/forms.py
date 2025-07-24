@@ -59,8 +59,8 @@ class ProductoForm(forms.ModelForm):
         if precio is not None:
             if precio <= Decimal('0'):
                 raise forms.ValidationError("El precio debe ser mayor a cero.")
-            if precio > Decimal('999999.99'):
-                raise forms.ValidationError("El precio no puede ser mayor a $999,999.99")
+            if precio > Decimal('999999999.99'):
+                raise forms.ValidationError("El precio no puede ser mayor a $999,999,999.99")
         return precio
     
     def clean_stock(self):

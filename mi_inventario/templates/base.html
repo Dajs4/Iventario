@@ -41,36 +41,6 @@
             padding: 20px;
         }
 
-        /* Header */
-        .header {
-            background-color: var(--bg-secondary);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-        }
-
-        .header h1 {
-            color: var(--text-primary);
-            font-size: 1.8rem;
-            font-weight: 600;
-        }
-
-        .header nav {
-            margin-top: 0.5rem;
-        }
-
-        .header nav a {
-            color: var(--text-secondary);
-            text-decoration: none;
-            margin-right: 1.5rem;
-            font-size: 0.9rem;
-            transition: color 0.2s;
-        }
-
-        .header nav a:hover {
-            color: var(--accent);
-        }
-
         /* Buttons */
         .btn {
             display: inline-block;
@@ -327,16 +297,6 @@
     </style>
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <h1>📦 Sistema de Inventario</h1>
-            <nav>
-                <a href="{% url 'inventario:lista_productos' %}">Productos</a>
-                <a href="/admin/">Administración</a>
-            </nav>
-        </div>
-    </header>
-
     <main class="container">
         {% if messages %}
             <div class="messages">
